@@ -8,9 +8,20 @@
   background: radial-gradient(50% 50% at 50% 50%, #02a32f 0%, #035b1c 100%);
 }
 
-.Header h1 {
-  font-size: 1.5rem;
+.Game-status {
+  padding: 0.5rem 0;
+  background: #fff;
+  text-align: center;
+}
+
+h1 {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3.75rem;
   margin: 1rem;
+  opacity: 0.15;
 }
 
 .ButtonGroup {
