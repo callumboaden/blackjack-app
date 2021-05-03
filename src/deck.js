@@ -32,19 +32,32 @@ export default class Deck {
       this.cards[i] = oldValue;
     }
   }
+
+  getNextCard() {
+    return this.cards.pop();
+  }
 }
 
 class Card {
-  constructor(suit, value) {
+  constructor(suit, value, weight) {
     this.suit = suit;
     this.value = value;
+    this.weight = weight;
   }
 }
 
 function createDeck() {
   return SUITS.flatMap((suit) => {
     return VALUES.map((value) => {
-      return new Card(suit, value);
+      return new Card(suit, value, assignWeight(value));
     });
   });
+}
+
+function assignWeight(value) {
+  return value === "A"
+    ? 11
+    : value === "J" || value === "Q" || value === "K"
+    ? 10
+    : parseInt(value);
 }

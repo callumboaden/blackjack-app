@@ -1,0 +1,38 @@
+.Card-wrapper {
+  background: #fff;
+  border-radius: 3px;
+  width: 45px;
+  height: 68px;
+  margin: 0 0.2rem;
+  padding: 0.1rem;
+  position: relative;
+}
+
+.Card-suit,
+.Card-value--top-left,
+.Card-value--bottom-right {
+  position: absolute;
+}
+
+.Card-suit {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+.Card-value--top-left,
+.Card-value--bottom-right {
+  padding: 0.2rem;
+  font-size: 0.9rem;
+}
+
+.Card-value--top-left {
+  top: 0;
+  left: 0;
+}
+
+.Card-value--bottom-right {
+  bottom: 0;
+  right: 0;
+}

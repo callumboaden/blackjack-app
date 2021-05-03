@@ -1,0 +1,11 @@
+.PlayerHand-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.PlayerHand-weight {
+  background: #fff;
+  font-size: 0.75rem;
+  padding: 0.15rem;
+}

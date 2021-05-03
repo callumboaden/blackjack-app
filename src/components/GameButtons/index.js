@@ -3,7 +3,7 @@ import "./styles.css";
 
 function GameButtons() {
   return (
-    <div className="ButtonGroup">
+    <div className="GameButtons">
       <Button name="Hit" />
       <Button name="Stand" />
       <Button name="Double" />
