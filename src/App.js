@@ -26,6 +26,25 @@ function App() {
     }
   };
 
+  const handleHit = (e) => {
+    console.log("hit");
+    // get card from deck.getNextCard()
+    let hand = playerHand;
+    let newCard = deck.getNextCard();
+
+    // push into playerHand
+    hand.cards.push(newCard);
+    // update hand weight
+    calculateHandWeight(hand);
+    // update state
+    setPlayerHand((prevState) => {
+      return { ...prevState, hand };
+    });
+    // check if busted
+
+    console.log(playerHand);
+  };
+
   const calculateHandWeight = (hand) => {
     let weight = 0;
     hand.cards.forEach((card) => {
@@ -70,7 +89,7 @@ function App() {
         {playerHand ? <Hand hand={playerHand} /> : ""}
       </div>
       <div className="ButtonGroup">
-        <GameButtons handleDeal={handleDeal} />
+        <GameButtons handleDeal={handleDeal} handleHit={handleHit} />
         {!isPlaying ? <BetButtons handleBet={handleBet} /> : ""}
       </div>
       <BottomBar balance={balance} bet={bet} win={win} />
