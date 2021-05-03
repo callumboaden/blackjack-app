@@ -20,10 +20,6 @@ function App() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameStatus, setGameStatus] = useState("");
 
-  useEffect(() => {
-    return isGameOver ? console.log("Game Over") : "";
-  });
-
   const handleNewGame = () => {
     setWin(0);
     setBet(0);
@@ -32,6 +28,11 @@ function App() {
     setIsPlaying(false);
     setIsGameOver(false);
     setGameStatus("");
+  };
+
+  const handleReplayGame = () => {
+    setBalance(1000);
+    handleNewGame();
   };
 
   const handleBet = (e) => {
@@ -53,42 +54,47 @@ function App() {
     });
 
     if (hand.weight > 21) {
-      setGameStatus("bust");
+      setGameStatus("Too many!");
       setIsGameOver(true);
     }
-
-    console.log(computerHand);
   };
 
   const handleComputerTurn = () => {
     let hand = computerHand;
     let weight = hand.weight;
 
-    while (weight <= 17) {
+    while (weight < 17) {
       hand.cards.push(deck.getNextCard());
-
       weight = calculateHandWeight(hand);
     }
 
     setComputerHand(hand);
   };
 
-  const handleStand = (e) => {
-    console.log("stand");
+  const handleStand = (betAmount = bet) => {
     let winAmount = 0;
-    const winner = checkWinner();
+
+    console.log(`bet: ${betAmount}`);
 
     handleComputerTurn();
+    const winner = checkWinner();
 
     if (winner === "dealer") {
       setGameStatus(`Dealer has ${computerHand.weight}. You lose!`);
     } else if (winner === "player") {
-      winAmount = bet * 2;
-      setGameStatus("Player wins!");
+      if (playerHand.weight === 21 && playerHand.cards.length === 2) {
+        winAmount += betAmount * 2 * 1.5;
+        setGameStatus("Blackjack!");
+      } else {
+        winAmount += betAmount * 2;
+        setGameStatus("Player wins!");
+      }
     } else if (winner === false) {
-      winAmount = bet;
+      winAmount = betAmount;
       setGameStatus("Push!");
     }
+
+    console.log(winAmount);
 
     setWin(winAmount);
     setBalance(balance + winAmount);
@@ -99,9 +105,11 @@ function App() {
     let computerScore = computerHand.weight;
     let playerScore = playerHand.weight;
 
-    return computerScore > playerScore
+    return computerScore > 21
+      ? "player"
+      : computerScore > playerScore && computerScore <= 21
       ? "dealer"
-      : playerScore > computerScore
+      : playerScore > computerScore && playerScore <= 21
       ? "player"
       : playerScore === computerScore
       ? false
@@ -116,6 +124,17 @@ function App() {
 
     hand.weight = weight;
     return weight;
+  };
+
+  const handleDouble = () => {
+    const betAmount = bet * 2;
+    setBet((prevState) => betAmount);
+    setBalance((prevState) => prevState + bet);
+
+    console.log("bet" + bet);
+
+    handleHit();
+    handleStand(betAmount);
   };
 
   const handleDeal = (e) => {
@@ -142,29 +161,35 @@ function App() {
 
   return (
     <div className="App">
-      {gameStatus ? <div className="Game-status">{gameStatus}</div> : ""}
+      {gameStatus && <div className="Game-status">{gameStatus}</div>}
       <h1>Blackjack</h1>
       <div className="Computer-wrapper" style={{ marginTop: "3rem" }}>
-        {computerHand ? <Hand hand={computerHand} isComputer /> : ""}
+        {computerHand && (
+          <Hand hand={computerHand} isGameOver={isGameOver} isDealer />
+        )}
       </div>
       <div className="ButtonGroup">
-        {isGameOver ? <NewGameButton handleClick={handleNewGame} /> : ""}
-        {bet > 0 && !isPlaying ? <DealButton handleDeal={handleDeal} /> : ""}
+        {balance === 0 && isGameOver && (
+          <button onClick={handleReplayGame}>Play again?</button>
+        )}
+        {isGameOver && balance > 0 && (
+          <NewGameButton handleClick={handleNewGame} />
+        )}
+        {bet > 0 && !isPlaying && <DealButton handleDeal={handleDeal} />}
       </div>
       <div className="Player-wrapper">
-        {playerHand ? <Hand hand={playerHand} /> : ""}
+        {playerHand && <Hand hand={playerHand} />}
       </div>
       <div className="ButtonGroup">
-        {isPlaying ? (
+        {isPlaying && !isGameOver && (
           <GameButtons
             handleDeal={handleDeal}
             handleHit={handleHit}
             handleStand={handleStand}
+            handleDouble={handleDouble}
           />
-        ) : (
-          ""
         )}
-        {!isPlaying ? <BetButtons handleBet={handleBet} /> : ""}
+        {!isPlaying && balance >= 0 && <BetButtons handleBet={handleBet} />}
       </div>
       <BottomBar balance={balance} bet={bet} win={win} />
     </div>
