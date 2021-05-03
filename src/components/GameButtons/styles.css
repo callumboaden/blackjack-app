@@ -1,0 +1,6 @@
+.ButtonGroup {
+  left: 50%;
+  bottom: 10%;
+  transform: translate(-50%, 0);
+  position: absolute;
+}
