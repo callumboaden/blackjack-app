@@ -15,6 +15,8 @@ function App() {
   const [win, setWin] = useState(0);
   const [bet, setBet] = useState(0);
   const [playerHand, setPlayerHand] = useState({});
+  const [playerHandList, setPlayerHandList] = useState([]);
+  const [activeHand, setActiveHand] = useState(0);
   const [computerHand, setComputerHand] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -37,11 +39,9 @@ function App() {
 
   const handleBet = (e) => {
     const betAmount = parseInt(e.target.dataset.value);
-
-    if (betAmount <= balance) {
-      setBet(bet + betAmount);
-      setBalance(balance - betAmount);
-    }
+    if (betAmount > balance) return;
+    setBet(bet + betAmount);
+    setBalance(balance - betAmount);
   };
 
   const handleHit = (e) => {
@@ -53,10 +53,9 @@ function App() {
       return { ...prevState, hand };
     });
 
-    if (hand.weight > 21) {
-      setGameStatus("Too many!");
-      setIsGameOver(true);
-    }
+    if (hand.weight < 21) return;
+    setGameStatus("Too many!");
+    setIsGameOver(true);
   };
 
   const handleComputerTurn = () => {
@@ -103,6 +102,45 @@ function App() {
     setBalance(balance + winAmount);
     setGameStatus(updatedGameStatus);
     setIsGameOver(true);
+  };
+
+  const handleSplit = () => {
+    console.log("Split Hand");
+    let oldHand,
+      newHand,
+      oldCard1,
+      oldCard2,
+      newCard1,
+      newCard2,
+      updatedPlayerHandList;
+
+    oldHand = playerHandList[activeHand];
+
+    oldCard1 = oldHand.cards[0];
+    oldCard2 = oldHand.cards[1];
+    newCard1 = deck.getNextCard();
+    newCard2 = deck.getNextCard();
+
+    oldHand.cards[0] = oldCard1;
+    oldHand.cards[1] = newCard1;
+
+    calculateHandWeight(
+      (newHand = {
+        cards: [oldCard1, newCard1],
+        bet,
+      })
+    );
+
+    calculateHandWeight(
+      (newHand = {
+        cards: [oldCard2, newCard2],
+        bet,
+      })
+    );
+
+    updatedPlayerHandList = [oldHand, newHand];
+
+    setPlayerHandList(updatedPlayerHandList);
   };
 
   const checkWinner = () => {
@@ -164,12 +202,14 @@ function App() {
   };
 
   const handleDeal = (e) => {
+    let updatedPlayerHandList = [];
     let newPlayerHand, newComputerHand;
     deck.shuffle();
 
     calculateHandWeight(
       (newPlayerHand = {
         cards: [deck.getNextCard(), deck.getNextCard()],
+        bet,
       })
     );
 
@@ -179,8 +219,10 @@ function App() {
       })
     );
 
+    updatedPlayerHandList.push(newPlayerHand);
+    setPlayerHandList(updatedPlayerHandList);
     setDeck(deck);
-    setPlayerHand(newPlayerHand);
+    // setPlayerHand(newPlayerHand);
     setComputerHand(newComputerHand);
     setIsPlaying(true);
   };
@@ -204,7 +246,9 @@ function App() {
         {bet > 0 && !isPlaying && <DealButton handleDeal={handleDeal} />}
       </div>
       <div className="Player-wrapper">
-        {playerHand && <Hand hand={playerHand} />}
+        {playerHandList.map((hand, i) => (
+          <Hand hand={hand} key={i} index={i} activeHand />
+        ))}
       </div>
       <div className="ButtonGroup">
         {isPlaying && !isGameOver && (
@@ -213,6 +257,7 @@ function App() {
             handleHit={handleHit}
             handleStand={handleStand}
             handleDouble={handleDouble}
+            handleSplit={handleSplit}
           />
         )}
         {!isPlaying && balance >= 0 && <BetButtons handleBet={handleBet} />}
