@@ -143,6 +143,8 @@ function App() {
     let updatedPlayerHand = playerHand;
     let updatedComputerHand = computerHand;
 
+    if (updatedBet > balance) return;
+
     updatedPlayerHand.cards.push(deck.getNextCard());
     calculateHandWeight(updatedPlayerHand);
     setBet(updatedBet);
