@@ -73,29 +73,25 @@ function App() {
   };
 
   const updateGameStatus = (winner, betAmount = bet) => {
-    let winAmount = 0;
-    let updatedGameStatus = "";
-
-    console.log(betAmount);
-
-    if (winner === "dealer") {
-      playerHand.weight > 21
-        ? (updatedGameStatus = "Bust!")
-        : (updatedGameStatus = `Dealer has ${computerHand.weight}. You lose!`);
-    } else if (winner === "player") {
-      if (playerHand.weight === 21 && playerHand.cards.length === 2) {
-        winAmount += betAmount * 2 * 1.5;
-        updatedGameStatus = "Blackjack!";
-      } else {
-        winAmount += betAmount * 2;
-        updatedGameStatus = "Player wins!";
-      }
-    } else if (winner === false) {
-      winAmount = betAmount;
-      updatedGameStatus = "Push!";
-    }
-
-    return { winAmount, updatedGameStatus };
+    return winner === "dealer" && playerHand.weight > 21
+      ? { winAmount: 0, updatedGameStatus: "Bust!" }
+      : winner === "dealer"
+      ? {
+          winAmount: 0,
+          updatedGameStatus: `Dealer has ${computerHand.weight}. You lose!`,
+        }
+      : winner === "player" &&
+        playerHand.weight === 21 &&
+        playerHand.cards.length === 2
+      ? { winAmount: betAmount * 2 * 1.5, updatedGameStatus: `Blackjack!` }
+      : winner === "player"
+      ? {
+          winAmount: betAmount * 2,
+          updatedGameStatus: `${playerHand.weight}. You win!`,
+        }
+      : winner === false
+      ? { winAmount: betAmount, updatedGameStatus: "Push!" }
+      : "";
   };
 
   const handleStand = () => {
@@ -143,7 +139,7 @@ function App() {
     let updatedPlayerHand = playerHand;
     let updatedComputerHand = computerHand;
 
-    if (updatedBet > balance) return;
+    if (updatedBet > balance || playerHand.cards.length > 2) return;
 
     updatedPlayerHand.cards.push(deck.getNextCard());
     calculateHandWeight(updatedPlayerHand);
