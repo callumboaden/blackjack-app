@@ -69,35 +69,43 @@ function App() {
     }
 
     setComputerHand(hand);
+    return hand;
   };
 
-  const handleStand = (betAmount = bet) => {
+  const updateGameStatus = (winner, betAmount = bet) => {
     let winAmount = 0;
+    let updatedGameStatus = "";
 
-    console.log(`bet: ${betAmount}`);
-
-    handleComputerTurn();
-    const winner = checkWinner();
+    console.log(betAmount);
 
     if (winner === "dealer") {
-      setGameStatus(`Dealer has ${computerHand.weight}. You lose!`);
+      playerHand.weight > 21
+        ? (updatedGameStatus = "Bust!")
+        : (updatedGameStatus = `Dealer has ${computerHand.weight}. You lose!`);
     } else if (winner === "player") {
       if (playerHand.weight === 21 && playerHand.cards.length === 2) {
         winAmount += betAmount * 2 * 1.5;
-        setGameStatus("Blackjack!");
+        updatedGameStatus = "Blackjack!";
       } else {
         winAmount += betAmount * 2;
-        setGameStatus("Player wins!");
+        updatedGameStatus = "Player wins!";
       }
     } else if (winner === false) {
       winAmount = betAmount;
-      setGameStatus("Push!");
+      updatedGameStatus = "Push!";
     }
 
-    console.log(winAmount);
+    return { winAmount, updatedGameStatus };
+  };
+
+  const handleStand = () => {
+    handleComputerTurn();
+    const winner = checkWinner();
+    const { winAmount, updatedGameStatus } = updateGameStatus(winner);
 
     setWin(winAmount);
     setBalance(balance + winAmount);
+    setGameStatus(updatedGameStatus);
     setIsGameOver(true);
   };
 
@@ -107,6 +115,8 @@ function App() {
 
     return computerScore > 21
       ? "player"
+      : playerScore > 21
+      ? "dealer"
       : computerScore > playerScore && computerScore <= 21
       ? "dealer"
       : playerScore > computerScore && playerScore <= 21
@@ -127,14 +137,32 @@ function App() {
   };
 
   const handleDouble = () => {
-    const betAmount = bet * 2;
-    setBet((prevState) => betAmount);
-    setBalance((prevState) => prevState + bet);
+    let winner = "";
+    let updatedBet = bet * 2;
+    let updatedBalance = balance - bet;
+    let updatedPlayerHand = playerHand;
+    let updatedComputerHand = computerHand;
 
-    console.log("bet" + bet);
+    updatedPlayerHand.cards.push(deck.getNextCard());
+    calculateHandWeight(updatedPlayerHand);
+    setBet(updatedBet);
+    setPlayerHand(updatedPlayerHand);
 
-    handleHit();
-    handleStand(betAmount);
+    if (updatedPlayerHand.weight < 21) {
+      updatedComputerHand = handleComputerTurn();
+    }
+
+    winner = checkWinner();
+
+    const { winAmount, updatedGameStatus } = updateGameStatus(
+      winner,
+      updatedBet
+    );
+
+    setBalance(updatedBalance + winAmount);
+    setWin(winAmount);
+    setGameStatus(updatedGameStatus);
+    setIsGameOver(true);
   };
 
   const handleDeal = (e) => {
