@@ -1,9 +1,12 @@
 import Card from "../Card";
 import "./styles.css";
 
-function Hand({ hand, isDealer, isGameOver }) {
+function Hand({ hand, isDealer, isGameOver, index, activeHand }) {
   return (
-    <div className="PlayerHand-wrapper">
+    <div
+      className="PlayerHand-wrapper"
+      style={{ opacity: activeHand === index ? "1" : ".5" }}
+    >
       {hand.cards
         ? hand.cards.map((card, i) => (
             <Card
@@ -27,6 +30,8 @@ function Hand({ hand, isDealer, isGameOver }) {
       ) : (
         ""
       )}
+
+      {hand.status ? <div>{hand.status}</div> : ""}
     </div>
   );
 }
