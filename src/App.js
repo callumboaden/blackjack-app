@@ -57,7 +57,10 @@ function App() {
     handList[activeHand] = hand;
 
     // check if weight is < 21
-    if (hand.weight > 21) currentHand++;
+    if (hand.weight > 21) {
+      currentHand++;
+      hand.status = "bust";
+    }
 
     setPlayerHandList((prevState) => handList);
 
@@ -69,9 +72,24 @@ function App() {
   };
 
   const handleGameOver = () => {
-    const dealerScore = handleComputerTurn();
+    let isBust = false;
     let playerWin = 0;
     let playerHands = [...playerHandList];
+
+    // if more than one hand loop through hands
+    for (let i = 0; i < playerHandList.length; i++) {
+      if (playerHandList[i].weight <= 21) {
+        continue;
+      } else {
+        isBust = true;
+      }
+    }
+
+    setIsGameOver(true);
+
+    if (isBust) return;
+
+    const dealerScore = handleComputerTurn();
 
     playerHands.map((hand) => {
       if (hand.weight === 21 && hand.cards.length === 2) {
@@ -96,7 +114,6 @@ function App() {
     setWin(playerWin);
     setBalance((prevState) => prevState + playerWin);
     setPlayerHandList((prevState) => playerHands);
-    setIsGameOver(true);
   };
 
   const handleComputerTurn = () => {
@@ -157,7 +174,7 @@ function App() {
     );
 
     updatedPlayerHandList = [oldHand, newHand];
-    console.log(updatedPlayerHandList);
+
     setBet((prevState) => prevState + bet);
     setBalance((prevState) => prevState - bet);
     setPlayerHandList(updatedPlayerHandList);
