@@ -76,7 +76,6 @@ function App() {
     let playerWin = 0;
     let playerHands = [...playerHandList];
 
-    // if more than one hand loop through hands
     for (let i = 0; i < playerHandList.length; i++) {
       if (playerHandList[i].weight <= 21) {
         continue;
@@ -151,7 +150,8 @@ function App() {
     oldCard1 = oldHand.cards[0];
     oldCard2 = oldHand.cards[1];
 
-    // if (oldCard1.weight !== oldCard2.weight) return;
+    if (oldHand.cards.length > 2) return;
+    if (oldCard1.weight !== oldCard2.weight) return;
 
     newCard1 = deck.getNextCard();
     newCard2 = deck.getNextCard();

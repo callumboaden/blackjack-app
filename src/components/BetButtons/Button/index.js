@@ -2,7 +2,12 @@ import "./styles.css";
 
 function Button({ value, handleBet }) {
   return (
-    <button onClick={handleBet} className="Button" data-value={value}>
+    <button
+      class="Button"
+      onClick={handleBet}
+      className="Button"
+      data-value={value}
+    >
       {value}
     </button>
   );
